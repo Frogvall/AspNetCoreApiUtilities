@@ -1,14 +1,14 @@
 # AspNetCoreApiUtilities
 
 [![CircleCI](https://circleci.com/gh/schwamster/HttpService.svg?style=shield&circle-token)](https://circleci.com/gh/Frogvall/AspNetCoreApiUtilities)
-![#](https://img.shields.io/nuget/v/AspNetCoreApiUtilities.svg)
+![#](https://img.shields.io/nuget/v/Frogvall.AspNetCore.ApiUtilities.svg)
 
 AspNetCoreApiUtilities for asp.net core that include things like an Exception Handler middleware, modelstate validation by attribute, RequireNonDefault attribute for controller models, and swagger operation filters for 400 and 500.
 
 ## Getting started
 
 ### Install the package
-Install the nuget package from [nuget](https://www.nuget.org/packages/AspNetCoreApiUtilities/)
+Install the nuget package from [nuget](https://www.nuget.org/packages/Frogvall.AspNetCore.ApiUtilities/)
 
 Either add it with the PM-Console:
         
