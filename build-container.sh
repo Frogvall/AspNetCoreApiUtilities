@@ -1,6 +1,6 @@
 #!bin/bash
 set -e
-cd test/AspNetCoreApiUtilities.Tests
+cd test/AspNetCoreApiUtilities.Test
 dotnet restore
 dotnet xunit -xml ${pwd}/../../testresults/out.xml
 cd -
