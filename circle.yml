@@ -1,0 +1,22 @@
+machine:  
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker build --build-arg -t aspnetcore-api-utilities-build .
+    - docker create --name aspnetcore-api-utilities-build aspnetcore-api-utilities-build
+    - docker cp aspnetcore-api-utilities-build:/package ./package
+    - docker cp aspnetcore-api-utilities-build:/testresults/ ./testresults
+
+test:
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit
+    - sudo mv testresults/out.xml $CIRCLE_TEST_REPORTS/junit
+    
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker run --rm -v ~/AspNetCoreApiUtilities/package:/data/package schwamster/nuget-docker push /data/package/*.nupkg $Nuget_Api_Key -Source nuget.org
