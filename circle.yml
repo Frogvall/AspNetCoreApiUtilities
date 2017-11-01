@@ -5,7 +5,7 @@ machine:
 dependencies:
   override:
     - docker info
-    - docker build --build-arg -t aspnetcore-api-utilities-build .
+    - docker build -t aspnetcore-api-utilities-build .
     - docker create --name aspnetcore-api-utilities-build aspnetcore-api-utilities-build
     - docker cp aspnetcore-api-utilities-build:/package ./package
     - docker cp aspnetcore-api-utilities-build:/testresults/ ./testresults
