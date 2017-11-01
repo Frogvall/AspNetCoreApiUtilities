@@ -14,11 +14,12 @@ Either add it with the PM-Console:
         
         Install-Package AspNetCoreApiUtilities
 
-Or add it to project.json
-        "dependencies": {
-            ...
-            "AspNetCoreApiUtilities": "XXX"
-        }
+Or add it to <project>.csproj
+        <ItemGroup>
+                ...
+                <PackageReference Include="Frogvall.AspNetCore.ApiUtilities" Version="x.y.z" /> 
+                ...
+        </ItemGroup>
 
 ### Using the utilites
 
