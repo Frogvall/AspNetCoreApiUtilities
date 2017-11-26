@@ -41,13 +41,13 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
             {
                 var statusCode = (int) (ex as ApiException).StatusCode;
                 context.Response.StatusCode = statusCode;
-                _logger.LogInformation("ApiException caught by ApiExceptionHandler with {exception} and {statusCode}", ex, statusCode);
+                _logger.LogInformation(ex, "ApiException caught by ApiExceptionHandler with {statusCode}.", statusCode);
             }
             else
             {
                 var statusCode = (int) HttpStatusCode.InternalServerError;
                 context.Response.StatusCode = statusCode;
-                _logger.LogWarning("Unhandled exception caught by ApiExceptionHandler with {exception} and {statusCode}", ex, statusCode);
+                _logger.LogWarning(ex, "Unhandled exception caught by ApiExceptionHandler.");
             }
 
             var error = BuildError(ex, _env);
