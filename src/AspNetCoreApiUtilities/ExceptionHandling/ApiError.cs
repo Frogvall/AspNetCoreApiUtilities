@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
@@ -36,10 +35,5 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Detail { get; set; }
-
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [DefaultValue("")]
-        public string StackTrace { get; set; }
-
     }
 }

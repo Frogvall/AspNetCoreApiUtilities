@@ -17,7 +17,7 @@ namespace AspNetCoreApiUtilities.Tests
             if (testDto.NonNullableObject < 0)
             {
                 var zero = 0;
-                var provoceException = 1 / zero; 
+                var provokeException = 1 / zero;
             }
             if (testDto.NonNullableObject > 1)
                 throw new ApiException(HttpStatusCode.Conflict, "Non-500 statuscode thrown.");

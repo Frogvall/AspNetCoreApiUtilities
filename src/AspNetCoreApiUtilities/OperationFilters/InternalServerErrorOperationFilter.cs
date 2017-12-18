@@ -7,7 +7,7 @@ namespace Frogvall.AspNetCore.ApiUtilities.OperationFilters
     {
         public void Apply(Operation operation, OperationFilterContext context)
         {
-            operation.Responses.Add("500", new Response { Description = "Internal server error." });
+            operation.Responses.Add("500", new Response { Description = "Internal server error" });
         }
     }
 }

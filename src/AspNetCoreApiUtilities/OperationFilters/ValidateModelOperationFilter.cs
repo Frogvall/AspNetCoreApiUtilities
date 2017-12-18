@@ -7,7 +7,7 @@ namespace Frogvall.AspNetCore.ApiUtilities.OperationFilters
     {
         public void Apply(Operation operation, OperationFilterContext context)
         {
-            operation.Responses.Add("400", new Response { Description = "Invalid parameters" });
+            operation.Responses.Add("400", new Response { Description = "Bad request" });
         }
     }
 }

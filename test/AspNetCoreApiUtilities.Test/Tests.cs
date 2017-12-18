@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Xunit;
 
 namespace AspNetCoreApiUtilities.Tests
@@ -30,11 +26,11 @@ namespace AspNetCoreApiUtilities.Tests
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddMvc();                    
+                    services.AddMvc();
                 })
                 .Configure(app =>
                 {
-                    app.UseApiExceptionHandler();                    
+                    app.UseApiExceptionHandler();
                     app.UseMvc();
                 });
 
@@ -63,6 +59,8 @@ namespace AspNetCoreApiUtilities.Tests
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
+
+            var text = response.Content.ReadAsStringAsync();
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
