@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.0-sdk
+FROM microsoft/dotnet:2.0.3-sdk
 RUN mkdir app
 WORKDIR /app
 
