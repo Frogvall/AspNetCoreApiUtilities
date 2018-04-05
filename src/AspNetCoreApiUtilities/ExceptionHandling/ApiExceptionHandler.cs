@@ -17,7 +17,7 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
     {
         private readonly IHostingEnvironment _env;
         private readonly ILogger<ApiExceptionHandler> _logger;
-        private readonly JsonSerializer _serializer;        
+        private readonly JsonSerializer _serializer;
 
         public ApiExceptionHandler(IHostingEnvironment env, ILogger<ApiExceptionHandler> logger)
         {
