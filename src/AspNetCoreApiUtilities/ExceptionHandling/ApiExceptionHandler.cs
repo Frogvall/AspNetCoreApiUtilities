@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AsyncFriendlyStackTrace;
 using Frogvall.AspNetCore.ApiUtilities.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -67,7 +68,7 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
             if (env.IsDevelopment())
             {
                 error.Message = ex.Message;
-                error.Detail = ex.StackTrace;
+                error.Detail = ex.ToAsyncString();
             }
             else
             {

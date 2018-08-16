@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-   <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>2.1.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>Frogvall.AspNetCore.ApiUtilities</RootNamespace>
     <AssemblyName>ApiUtilities</AssemblyName>
@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AsyncFriendlyStackTrace" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.1" />
