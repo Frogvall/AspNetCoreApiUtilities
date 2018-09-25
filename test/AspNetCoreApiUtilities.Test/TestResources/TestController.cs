@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Frogvall.AspNetCore.ApiUtilities.Attributes;
 using Frogvall.AspNetCore.ApiUtilities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AspNetCoreApiUtilities.Tests
+namespace AspNetCoreApiUtilities.Tests.TestResources
 {
     [Route("api/[controller]")]
     public class TestController : Controller

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 using Frogvall.AspNetCore.ApiUtilities.Attributes;
 
-namespace AspNetCoreApiUtilities.Tests
+namespace AspNetCoreApiUtilities.Tests.TestResources
 {
     public class TestDto
     {

@@ -1,4 +1,5 @@
 ﻿using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
+using Frogvall.AspNetCore.ApiUtilities.Middleware;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,11 @@ namespace Microsoft.AspNetCore.Builder
                     builder.ApplicationServices.GetRequiredService<ILogger<ApiExceptionHandler>>())
                         .ExceptionHandler
             });
+        }
+
+        public static IApplicationBuilder UseExceptionStatusCodeDecorator(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<ExceptionStatusCodeDecoratorMiddleware>();
         }
     }
 }
