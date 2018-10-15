@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using AspNetCoreApiUtilities.Tests.TestResources;
 using FluentAssertions;
 using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
@@ -50,7 +50,8 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 0}}", Encoding.UTF8, "text/json");
-            var expectedError = "The NonNullableObject field requires a non-default value.";
+            const string expectedError = "The NonNullableObject field requires a non-default value.";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -60,7 +61,7 @@ namespace AspNetCoreApiUtilities.Tests
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             error.ErrorCode.Should().Be(1337);
             ((JObject)error.DeveloperContext)["NonNullableObject"].ToObject<string[]>().FirstOrDefault().Should().Be(expectedError);
-            error.Service.Should().Be("testhost");
+            error.Service.Should().Be(expectedServiceName);
         }
 
         [Fact]
@@ -68,7 +69,8 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string""}}", Encoding.UTF8, "text/json");
-            var expectedError = "The NonNullableObject field requires a non-default value.";
+            const string expectedError = "The NonNullableObject field requires a non-default value.";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -78,7 +80,7 @@ namespace AspNetCoreApiUtilities.Tests
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             error.ErrorCode.Should().Be(1337);
             ((JObject)error.DeveloperContext)["NonNullableObject"].ToObject<string[]>().FirstOrDefault().Should().Be(expectedError);
-            error.Service.Should().Be("testhost");
+            error.Service.Should().Be(expectedServiceName);
         }
 
         [Fact]
@@ -86,7 +88,8 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NonNullableObject"": 1}}", Encoding.UTF8, "text/json");
-            var expectedError = "The NullableObject field is required.";
+            const string expectedError = "The NullableObject field is required.";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -96,7 +99,7 @@ namespace AspNetCoreApiUtilities.Tests
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             error.ErrorCode.Should().Be(1337);
             ((JObject)error.DeveloperContext)["NullableObject"].ToObject<string[]>().FirstOrDefault().Should().Be(expectedError);
-            error.Service.Should().Be("testhost");
+            error.Service.Should().Be(expectedServiceName);
         }
     }
 }

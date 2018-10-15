@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AspNetCoreApiUtilities.Tests.TestResources;
@@ -62,6 +63,7 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": -1}}", Encoding.UTF8, "text/json");
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -71,7 +73,7 @@ namespace AspNetCoreApiUtilities.Tests
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
             error.ErrorCode.Should().Be(-1);
             error.DeveloperContext.Should().BeNull();
-            error.Service.Should().Be("testhost");
+            error.Service.Should().Be(expectedServiceName);
         }
 
         [Fact]
@@ -79,6 +81,7 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 4}}", Encoding.UTF8, "text/json");
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -88,7 +91,7 @@ namespace AspNetCoreApiUtilities.Tests
             response.StatusCode.Should().Be(HttpStatusCode.Conflict);
             error.ErrorCode.Should().Be(-2);
             error.DeveloperContext.Should().BeNull();
-            error.Service.Should().Be("testhost");
+            error.Service.Should().Be(expectedServiceName);
         }
 
         [Fact]
@@ -96,6 +99,8 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 3}}", Encoding.UTF8, "text/json");
+            const string expectedContext = "Test1";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -104,8 +109,8 @@ namespace AspNetCoreApiUtilities.Tests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             error.ErrorCode.Should().Be(80);
-            ((JObject) error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be("Test1");
-            error.Service.Should().Be("testhost");
+            ((JObject) error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            error.Service.Should().Be(expectedServiceName);
         }
 
         [Fact]
@@ -113,6 +118,8 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 2}}", Encoding.UTF8, "text/json");
+            const string expectedContext = "Test2";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -121,8 +128,8 @@ namespace AspNetCoreApiUtilities.Tests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
             error.ErrorCode.Should().Be(443);
-            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be("Test2");
-            error.Service.Should().Be("testhost");
+            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            error.Service.Should().Be(expectedServiceName);
         }
     }
 }
