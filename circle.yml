@@ -1,4 +1,4 @@
-machine:  
+machine:
   services:
     - docker
 
@@ -14,7 +14,7 @@ test:
   override:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit
     - sudo mv testresults/out.xml $CIRCLE_TEST_REPORTS/junit
-    
+
 deployment:
   hub:
     branch: master
