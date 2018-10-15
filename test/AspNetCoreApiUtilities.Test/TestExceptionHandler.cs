@@ -1,12 +1,18 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using AspNetCoreApiUtilities.Tests.TestResources;
 using FluentAssertions;
+using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
+using Frogvall.AspNetCore.ApiUtilities.Mapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace AspNetCoreApiUtilities.Tests
@@ -26,6 +32,7 @@ namespace AspNetCoreApiUtilities.Tests
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
+                    services.AddExceptionMapper();
                     services.AddMvc();
                 })
                 .Configure(app =>
@@ -56,27 +63,73 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": -1}}", Encoding.UTF8, "text/json");
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
-
-            var text = response.Content.ReadAsStringAsync();
+            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            error.ErrorCode.Should().Be(-1);
+            error.DeveloperContext.Should().BeNull();
+            error.Service.Should().Be(expectedServiceName);
         }
 
         [Fact]
-        public async Task PostTest_TooHighIntDto_ReturnsConflict()
+        public async Task PostTest_DtoIntSetToFour_ReturnsConflict()
         {
             //Arrange
-            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 2}}", Encoding.UTF8, "text/json");
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 4}}", Encoding.UTF8, "text/json");
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
+            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+            error.ErrorCode.Should().Be(-2);
+            error.DeveloperContext.Should().BeNull();
+            error.Service.Should().Be(expectedServiceName);
+        }
+
+        [Fact]
+        public async Task PostTest_DtoIntSetToThree_ReturnsError()
+        {
+            //Arrange
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 3}}", Encoding.UTF8, "text/json");
+            const string expectedContext = "Test1";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+
+            // Act
+            var response = await _client.PostAsync("/api/Test", content);
+            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            error.ErrorCode.Should().Be(80);
+            ((JObject) error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            error.Service.Should().Be(expectedServiceName);
+        }
+
+        [Fact]
+        public async Task PostTest_DtoIntSetToTwo_ReturnsFault()
+        {
+            //Arrange
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 2}}", Encoding.UTF8, "text/json");
+            const string expectedContext = "Test2";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+
+            // Act
+            var response = await _client.PostAsync("/api/Test", content);
+            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            error.ErrorCode.Should().Be(443);
+            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            error.Service.Should().Be(expectedServiceName);
         }
     }
 }

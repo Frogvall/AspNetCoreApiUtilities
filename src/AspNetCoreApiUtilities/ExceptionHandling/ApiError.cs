@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
@@ -10,30 +11,45 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
 
         public ApiError()
         {
+            Service = Assembly.GetEntryAssembly().GetName().Name;
         }
 
-        public ApiError(string message)
+        public ApiError(int errorCode, object developerContext, string message)
         {
+            ErrorCode = errorCode;
+            Service = Assembly.GetEntryAssembly().GetName().Name;
             Message = message;
+            DeveloperContext = developerContext;
         }
 
         /// <summary>
         /// Creates a new <see cref="ApiError"/> from the result of a model binding attempt.
-        /// The first model binding error (if any) is placed in the <see cref="Detail"/> property.
+        /// The model binding errors (if any) are placed in the <see cref="DeveloperContext"/> property.
         /// </summary>
+        /// <param name="errorCode"></param>
         /// <param name="modelState"></param>
-        public ApiError(ModelStateDictionary modelState)
+        /// <param name="correlationId"></param>
+        public ApiError(int errorCode, ModelStateDictionary modelState, string correlationId)
         {
+            Service = Assembly.GetEntryAssembly().GetName().Name;
             Message = ModelBindingErrorMessage;
-
-            Detail = modelState
-                .FirstOrDefault(x => x.Value.Errors.Any())
-                .Value?.Errors?.FirstOrDefault()?.ErrorMessage;
+            ErrorCode = errorCode;
+            DeveloperContext = new SerializableError(modelState);
+            CorrelationId = correlationId;
         }
+        public string Service { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string CorrelationId { get; set; }
 
         public string Message { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string Detail { get; set; }
+        public string DetailedMessage { get; set; }
+
+        public int ErrorCode { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public object DeveloperContext { get; set; }
     }
 }

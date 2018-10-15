@@ -28,7 +28,7 @@ namespace AspNetCoreApiUtilities.Tests
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddMvc();
+                    services.AddExceptionMapper().AddMvc();
                 })
                 .Configure(app =>
                 {
@@ -68,7 +68,33 @@ namespace AspNetCoreApiUtilities.Tests
         }
 
         [Fact]
-        public async Task PostTest_TooHighIntDto_ReturnsConflict()
+        public async Task PostTest_DtoIntSetToFour_ReturnsConflict()
+        {
+            //Arrange
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 4}}", Encoding.UTF8, "text/json");
+
+            // Act
+            var response = await _client.PostAsync("/api/Test", content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        }
+
+        [Fact]
+        public async Task PostTest_DtoIntSetToThree_ReturnsError()
+        {
+            //Arrange
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 3}}", Encoding.UTF8, "text/json");
+
+            // Act
+            var response = await _client.PostAsync("/api/Test", content);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task PostTest_DtoIntSetToTwo_ReturnsFault()
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 2}}", Encoding.UTF8, "text/json");
@@ -77,7 +103,7 @@ namespace AspNetCoreApiUtilities.Tests
             var response = await _client.PostAsync("/api/Test", content);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+            response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
     }
 }
