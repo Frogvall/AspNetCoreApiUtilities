@@ -25,31 +25,31 @@ Or add it to csproj file ->
 ### Using the utilites
 
 Edit your Startup.cs ->
-
-        ConfigureServices(IServiceCollection services)
+```cs
+        public void ConfigureServices(IServiceCollection services)
         {
-          ...
+          //...
 
           services.AddExceptionMapper();
 
-          ...
+          //...
         }
 
-        Configure()
+        public void Configure()
         {
-           ...
+           //...
 
            app.UseApiExceptionHandler();
 
-           ...
+           //...
         }
-
+```
 Create an exeption that inherits BaseApiException ->
-
+```cs
         public class MyException : BaseApiException
-
+```
 Create one or more exception mapper profiles anywhere in your project. Add mappings in the constructor of the profile ->
-
+```cs
         public class MyMappingProfile : ExceptionMappingProfile
         {
           public MyMappingProfile()
@@ -57,23 +57,24 @@ Create one or more exception mapper profiles anywhere in your project. Add mappi
              AddMapping<MyException>(ExceptionReturnType.Error, 1337);
           }
         }
-
+```
 Throw when returning non 2xx ->
-
+```cs
         throw new MyException("Some message.", new { AnyProperty = "AnyValue."});
-
+```
 Add to controller method ->1
-
+```cs
         [ValidateModel(ErrorCode = 123)]
-
+```
 Add to controller model (dto) property ->
-
+```cs
         [RequireNonDefault]
-
+```
 Add to swagger spec ->
-
+```cs
         options.OperationFilter<ValidateModelOperationFilter>();
         options.OperationFilter<InternalServerErrorOperationFilter>();
+```
 
 ## Build and Publish
 
