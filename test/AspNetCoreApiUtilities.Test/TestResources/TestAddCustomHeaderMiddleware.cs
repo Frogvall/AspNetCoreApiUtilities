@@ -19,11 +19,6 @@ namespace AspNetCoreApiUtilities.Tests.TestResources
         {
             var testHeaderValue = context.Request.Headers[TestHeader];
             context.Response.Headers.TryAdd(TestHeader, testHeaderValue);
-            //context.Response.OnStarting(state =>
-            //{
-            //    ((HttpContext)state).Response.Headers.TryAdd(TestHeader, testHeaderValue);
-            //    return Task.CompletedTask;
-            //}, context);
             await _next(context);
         }
     }
