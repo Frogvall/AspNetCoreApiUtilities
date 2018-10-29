@@ -1,5 +1,4 @@
 ﻿using System;
-using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 
 namespace Frogvall.AspNetCore.ApiUtilities.Exceptions
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Frogvall.AspNetCore.ApiUtilities.Exceptions;
 
 namespace AspNetCoreApiUtilities.Tests.TestResources
