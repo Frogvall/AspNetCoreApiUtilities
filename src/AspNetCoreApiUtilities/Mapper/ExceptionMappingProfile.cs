@@ -10,10 +10,15 @@ namespace Frogvall.AspNetCore.ApiUtilities.Mapper
 
         protected void AddMapping<TException>(ExceptionReturnType exceptionReturnType, int errorCode) where TException : BaseApiException
         {
+            AddMapping<TException>(exceptionReturnType, ex => errorCode);
+        }
+
+        protected void AddMapping<TException>(ExceptionReturnType exceptionReturnType, Func<TException, int> errorCode) where TException : BaseApiException
+        {
             var typeOfTException = typeof(TException);
             if (ExceptionMap.ContainsKey(typeOfTException))
                 throw new ArgumentException($"Duplicate entry. Exception exceptionReturnType already added to map: {typeOfTException.FullName}");
-            ExceptionMap.Add(typeOfTException, new ExceptionMapper.ExceptionDescription { ErrorCode = errorCode, ExceptionReturnType = exceptionReturnType });
+            ExceptionMap.Add(typeOfTException, new ExceptionMapper.ExceptionDescription<TException> { ErrorCode = errorCode, ExceptionReturnType = exceptionReturnType });
         }
     }
 }

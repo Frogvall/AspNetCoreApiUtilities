@@ -26,8 +26,8 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
                     try
                     {
                         developerContext = (ex as BaseApiException)?.DeveloperContext;
-                        errorCode = mapper.GetErrorCode(ex.GetType());
-                        var exceptionType = mapper.GetExceptionReturnType(ex.GetType());
+                        errorCode = mapper.GetErrorCode(ex as BaseApiException);
+                        var exceptionType = mapper.GetExceptionReturnType(ex as BaseApiException);
                         switch (exceptionType)
                         {
                             case ExceptionReturnType.Error:

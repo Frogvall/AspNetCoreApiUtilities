@@ -81,6 +81,46 @@ namespace AspNetCoreApiUtilities.Tests
         }
 
         [Fact]
+        public async Task PostTest_DtoIntSetToSix_ReturnsError()
+        {
+            //Arrange
+            var expectedErrorCode = 6;
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": {expectedErrorCode}}}", Encoding.UTF8, "text/json");
+            const string expectedContext = "Test1";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+
+            // Act
+            var response = await _client.PostAsync("/api/Test", content);
+            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            error.ErrorCode.Should().Be(expectedErrorCode);
+            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            error.Service.Should().Be(expectedServiceName);
+        }
+
+        [Fact]
+        public async Task PostTest_DtoIntSetToFive_ReturnsError()
+        {
+            //Arrange
+            var expectedErrorCode = 5;
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": {expectedErrorCode}}}", Encoding.UTF8, "text/json");
+            const string expectedContext = "Test1";
+            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+
+            // Act
+            var response = await _client.PostAsync("/api/Test", content);
+            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            error.ErrorCode.Should().Be(expectedErrorCode);
+            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            error.Service.Should().Be(expectedServiceName);
+        }
+
+        [Fact]
         public async Task PostTest_DtoIntSetToFour_ReturnsConflict()
         {
             //Arrange

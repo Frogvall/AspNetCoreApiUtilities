@@ -29,7 +29,7 @@ namespace Frogvall.AspNetCore.ApiUtilities.Middleware
             }
             catch (BaseApiException ex)
             {
-                var exceptionReturnType = _mapper.GetExceptionReturnType(ex.GetType());
+                var exceptionReturnType = _mapper.GetExceptionReturnType(ex);
                 switch (exceptionReturnType)
                 {
                     case ExceptionReturnType.Error:

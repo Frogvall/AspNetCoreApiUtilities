@@ -22,25 +22,46 @@ namespace Frogvall.AspNetCore.ApiUtilities.Mapper
             }
         }
 
-        internal class ExceptionDescription
+        internal abstract class ExceptionDescription
         {
-            public int ErrorCode { get; set; }
             public ExceptionReturnType ExceptionReturnType { get; set; }
         }
 
-        public int GetErrorCode(Type exceptionType)
+        internal class ExceptionDescription<TException> : ExceptionDescription
         {
-            if (!exceptionType.IsSubclassOf(typeof(BaseApiException)))
-                throw new ArgumentException("exceptionType needs to be a subclass of BaseApiException");
-            if (!_map.ContainsKey(exceptionType))
-                throw new ArgumentException($"Exception {exceptionType.FullName} has not been mapped. Should be treated as an unexpected exception");
-            return _map[exceptionType].ErrorCode;
+            public Func<TException, int> ErrorCode { get; set; }
         }
 
-        public ExceptionReturnType GetExceptionReturnType(Type exceptionType)
+        public int GetErrorCode(BaseApiException exception)
         {
+            try
+            {
+                var exceptionType = exception.GetType();
+                if (!_map.ContainsKey(exceptionType))
+                    throw new ArgumentException(
+                        $"Exception {exceptionType.FullName} has not been mapped accordingly. Should be treated as an unexpected exception");
+                var exceptionDescriptionType = typeof(ExceptionDescription<>).MakeGenericType(exceptionType);
+                var instance = Convert.ChangeType(_map[exceptionType], exceptionDescriptionType);
+                var property = exceptionDescriptionType.GetProperty("ErrorCode");
+                var method = property?.PropertyType.GetMethod("Invoke");
+                var errorCode = method?.Invoke(property.GetValue(instance), new object[] { exception });
+                if (errorCode == null)
+                    throw new ArgumentException(
+                        $"Exception {exceptionType.FullName} has not been mapped accordingly. Should be treated as an unexpected exception");
+                return (int) errorCode;
+            }
+            catch
+            {
+                throw new ArgumentException(
+                    $"Exception {exception.GetType().FullName} has not been mapped accordingly. Should be treated as an unexpected exception");
+            }
+        }
+
+        public ExceptionReturnType GetExceptionReturnType(BaseApiException exception)
+        {
+            var exceptionType = exception.GetType();
             if (!exceptionType.IsSubclassOf(typeof(BaseApiException)))
-                throw new ArgumentException("exceptionType needs to be a subclass of BaseApiException");
+                throw new ArgumentException("exception needs to be a subclass of BaseApiException");
             if (!_map.ContainsKey(exceptionType))
                 throw new ArgumentException($"Exception {exceptionType.FullName} has not been mapped. Should be treated as an unexpected exception");
             return _map[exceptionType].ExceptionReturnType;

@@ -17,6 +17,9 @@ namespace AspNetCoreApiUtilities.Tests.TestResources
                 var zero = 0;
                 var provokeException = 1 / zero;
             }
+
+            if (testDto.NonNullableObject > 4)
+                throw new TestException3(testDto.NonNullableObject, "Object > 4", new TestDeveloperContext { TestContext = "Test1" });
             if (testDto.NonNullableObject > 3)
                 throw new ApiException(HttpStatusCode.Conflict, "Non-500 statuscode thrown.");
             if (testDto.NonNullableObject > 2)
