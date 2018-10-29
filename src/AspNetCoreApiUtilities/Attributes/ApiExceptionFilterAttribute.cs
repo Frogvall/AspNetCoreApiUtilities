@@ -1,24 +1,24 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Frogvall.AspNetCore.ApiUtilities.Mapper;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
+namespace Frogvall.AspNetCore.ApiUtilities.Attributes
 {
-    internal class ApiExceptionHandler
+    public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
     {
         private readonly IExceptionMapper _mapper;
         private readonly IHostingEnvironment _env;
-        private readonly ILogger<ApiExceptionHandler> _logger;
+        private readonly ILogger<ApiExceptionFilterAttribute> _logger;
         private readonly JsonSerializer _serializer;
 
-        internal ApiExceptionHandler(IExceptionMapper mapper, IHostingEnvironment env,
-            ILogger<ApiExceptionHandler> logger)
+        public ApiExceptionFilterAttribute(IExceptionMapper mapper, IHostingEnvironment env,
+            ILogger<ApiExceptionFilterAttribute> logger)
         {
             _mapper = mapper;
             _env = env;
@@ -29,18 +29,20 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
             };
         }
 
-        internal async Task ExceptionHandler(HttpContext context)
+        public override async Task OnExceptionAsync(ExceptionContext context)
         {
-            var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+            var ex = context.Exception;
             if (ex == null) return;
 
-            var error = ApiErrorFactory.Build(context, ex, _mapper, _logger, _env.IsDevelopment());
+            var error = ApiErrorFactory.Build(context.HttpContext, ex, _mapper, _logger, _env.IsDevelopment());
 
-            using (var writer = new StreamWriter(context.Response.Body))
+            using (var writer = new StreamWriter(context.HttpContext.Response.Body))
             {
                 _serializer.Serialize(writer, error);
                 await writer.FlushAsync().ConfigureAwait(false);
             }
+
+            context.ExceptionHandled = true;
         }
     }
 }

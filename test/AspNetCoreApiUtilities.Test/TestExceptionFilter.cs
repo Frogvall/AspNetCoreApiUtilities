@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AspNetCoreApiUtilities.Tests.TestResources;
 using FluentAssertions;
+using Frogvall.AspNetCore.ApiUtilities.Attributes;
 using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,11 +18,11 @@ using Xunit;
 
 namespace AspNetCoreApiUtilities.Tests
 {
-    public class TestExceptionHandler
+    public class TestExceptionFilter
     {
         private HttpClient _client;
 
-        public TestExceptionHandler()
+        public TestExceptionFilter()
         {
             // Run for every test case
             SetupServer();
@@ -32,11 +34,13 @@ namespace AspNetCoreApiUtilities.Tests
                 .ConfigureServices(services =>
                 {
                     services.AddExceptionMapper();
-                    services.AddMvc();
+                    services.AddMvc(options =>
+                        {
+                            options.Filters.Add<ApiExceptionFilterAttribute>();
+                        });
                 })
                 .Configure(app =>
                 {
-                    app.UseApiExceptionHandler();
                     app.UseMiddleware<TestAddCustomHeaderMiddleware>();
                     app.UseMvc();
                 });
@@ -62,9 +66,9 @@ namespace AspNetCoreApiUtilities.Tests
         public async Task PostTest_NegativeIntDto_ReturnsInternalServerError()
         {
             //Arrange
-            var notExpectedHeaderValue = "test-value";
+            var expectedHeaderValue = "test-value";
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": -1}}", Encoding.UTF8, "text/json");
-            content.Headers.Add(TestAddCustomHeaderMiddleware.TestHeader, new[] { notExpectedHeaderValue });
+            content.Headers.Add(TestAddCustomHeaderMiddleware.TestHeader, new[]{expectedHeaderValue});
             var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
 
             // Act
@@ -74,7 +78,7 @@ namespace AspNetCoreApiUtilities.Tests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
             response.Headers.TryGetValues(TestAddCustomHeaderMiddleware.TestHeader, out var actualValues);
-            actualValues.Should().BeNull();
+            actualValues.FirstOrDefault().Should().Be(expectedHeaderValue);
             error.ErrorCode.Should().Be(-1);
             error.DeveloperContext.Should().BeNull();
             error.Service.Should().Be(expectedServiceName);
@@ -113,7 +117,7 @@ namespace AspNetCoreApiUtilities.Tests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             error.ErrorCode.Should().Be(80);
-            ((JObject) error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
+            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
             error.Service.Should().Be(expectedServiceName);
         }
 
