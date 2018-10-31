@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
@@ -9,15 +8,16 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
     {
         public const string ModelBindingErrorMessage = "Invalid parameters.";
 
-        public ApiError()
+        [JsonConstructor]
+        public ApiError(string serviceName)
         {
-            Service = Assembly.GetEntryAssembly().GetName().Name;
+            Service = serviceName;
         }
 
-        public ApiError(int errorCode, object developerContext, string message)
+        public ApiError(int errorCode, object developerContext, string message, string serviceName)
         {
             ErrorCode = errorCode;
-            Service = Assembly.GetEntryAssembly().GetName().Name;
+            Service = serviceName;
             Message = message;
             DeveloperContext = developerContext;
         }
@@ -29,9 +29,10 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
         /// <param name="errorCode"></param>
         /// <param name="modelState"></param>
         /// <param name="correlationId"></param>
-        public ApiError(int errorCode, ModelStateDictionary modelState, string correlationId)
+        /// <param name="serviceName"></param>
+        public ApiError(int errorCode, ModelStateDictionary modelState, string correlationId, string serviceName)
         {
-            Service = Assembly.GetEntryAssembly().GetName().Name;
+            Service = serviceName;
             Message = ModelBindingErrorMessage;
             ErrorCode = errorCode;
             DeveloperContext = new SerializableError(modelState);

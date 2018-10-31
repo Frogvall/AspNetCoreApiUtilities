@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AspNetCoreApiUtilities.Tests.TestResources;
 using FluentAssertions;
 using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
+using Frogvall.AspNetCore.ApiUtilities.Mapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -20,6 +21,8 @@ namespace AspNetCoreApiUtilities.Tests
     {
         private HttpClient _client;
 
+        private const string TestServiceName = "TestServiceName";
+
         public TestExceptionHandler()
         {
             // Run for every test case
@@ -31,7 +34,10 @@ namespace AspNetCoreApiUtilities.Tests
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddExceptionMapper();
+                    services.AddExceptionMapper(new ExceptionMapperOptions
+                    {
+                        ServiceName = TestServiceName
+                    });
                     services.AddMvc();
                 })
                 .Configure(app =>
@@ -65,7 +71,7 @@ namespace AspNetCoreApiUtilities.Tests
             var notExpectedHeaderValue = "test-value";
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": -1}}", Encoding.UTF8, "text/json");
             content.Headers.Add(TestAddCustomHeaderMiddleware.TestHeader, new[] { notExpectedHeaderValue });
-            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+            var expectedServiceName = TestServiceName;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -81,33 +87,13 @@ namespace AspNetCoreApiUtilities.Tests
         }
 
         [Fact]
-        public async Task PostTest_DtoIntSetToSix_ReturnsError()
-        {
-            //Arrange
-            var expectedErrorCode = 6;
-            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": {expectedErrorCode}}}", Encoding.UTF8, "text/json");
-            const string expectedContext = "Test1";
-            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
-
-            // Act
-            var response = await _client.PostAsync("/api/Test", content);
-            var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            error.ErrorCode.Should().Be(expectedErrorCode);
-            ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
-            error.Service.Should().Be(expectedServiceName);
-        }
-
-        [Fact]
         public async Task PostTest_DtoIntSetToFive_ReturnsError()
         {
             //Arrange
-            var expectedErrorCode = 5;
-            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": {expectedErrorCode}}}", Encoding.UTF8, "text/json");
+            var expectedErrorCode = TestEnum.MyThirdValue;
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 5}}", Encoding.UTF8, "text/json");
             const string expectedContext = "Test1";
-            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+            var expectedServiceName = TestServiceName;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -115,7 +101,7 @@ namespace AspNetCoreApiUtilities.Tests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            error.ErrorCode.Should().Be(expectedErrorCode);
+            error.ErrorCode.Should().Be((int)expectedErrorCode);
             ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
             error.Service.Should().Be(expectedServiceName);
         }
@@ -125,7 +111,7 @@ namespace AspNetCoreApiUtilities.Tests
         {
             //Arrange
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 4}}", Encoding.UTF8, "text/json");
-            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+            var expectedServiceName = TestServiceName;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -142,9 +128,10 @@ namespace AspNetCoreApiUtilities.Tests
         public async Task PostTest_DtoIntSetToThree_ReturnsError()
         {
             //Arrange
+            var expectedErrorCode = TestEnum.MyFirstValue;
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 3}}", Encoding.UTF8, "text/json");
             const string expectedContext = "Test1";
-            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+            var expectedServiceName = TestServiceName;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -152,7 +139,7 @@ namespace AspNetCoreApiUtilities.Tests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            error.ErrorCode.Should().Be(80);
+            error.ErrorCode.Should().Be((int)expectedErrorCode);
             ((JObject) error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
             error.Service.Should().Be(expectedServiceName);
         }
@@ -161,9 +148,10 @@ namespace AspNetCoreApiUtilities.Tests
         public async Task PostTest_DtoIntSetToTwo_ReturnsFault()
         {
             //Arrange
+            var expectedErrorCode = TestEnum.MySecondValue;
             var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 2}}", Encoding.UTF8, "text/json");
             const string expectedContext = "Test2";
-            var expectedServiceName = Assembly.GetEntryAssembly().GetName().Name;
+            var expectedServiceName = TestServiceName;
 
             // Act
             var response = await _client.PostAsync("/api/Test", content);
@@ -171,7 +159,7 @@ namespace AspNetCoreApiUtilities.Tests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-            error.ErrorCode.Should().Be(443);
+            error.ErrorCode.Should().Be((int)expectedErrorCode);
             ((JObject)error.DeveloperContext).ToObject<TestDeveloperContext>().TestContext.Should().Be(expectedContext);
             error.Service.Should().Be(expectedServiceName);
         }

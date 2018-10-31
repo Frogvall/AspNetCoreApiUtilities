@@ -2,7 +2,7 @@
 
 namespace Frogvall.AspNetCore.ApiUtilities.Exceptions
 {
-    public class BaseApiException : Exception
+    public abstract class BaseApiException : Exception
     {
         public object DeveloperContext { get; set; }
         public BaseApiException(string message, object developerContext) : base(message)

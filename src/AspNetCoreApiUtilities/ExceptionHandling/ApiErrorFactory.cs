@@ -27,31 +27,11 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
                     {
                         developerContext = (ex as BaseApiException)?.DeveloperContext;
                         errorCode = mapper.GetErrorCode(ex as BaseApiException);
-                        var exceptionType = mapper.GetExceptionReturnType(ex as BaseApiException);
-                        switch (exceptionType)
-                        {
-                            case ExceptionReturnType.Error:
-                                statusCode = HttpStatusCode.BadRequest;
-                                context.Response.StatusCode = (int)statusCode;
-                                logger.LogDebug(ex,
-                                    "Mapped BaseApiException of type {exceptionType} caught by ApiExceptionHandler. Unexpected: {unexpected}",
-                                    ex.GetType(), false);
-                                break;
-                            case ExceptionReturnType.Fault:
-                                statusCode = HttpStatusCode.InternalServerError;
-                                context.Response.StatusCode = (int)statusCode;
-                                logger.LogDebug(ex,
-                                    "Mapped BaseApiException of type {exceptionType} caught by ApiExceptionHandler. Unexpected: {unexpected}",
-                                    ex.GetType(), false);
-                                break;
-                            default:
-                                statusCode = HttpStatusCode.InternalServerError;
-                                context.Response.StatusCode = (int)statusCode;
-                                logger.LogDebug(ex,
-                                    "BaseApiException of unknown type {exceptionType} caught by ApiExceptionHandler. Unexpected: {unexpected}",
-                                    ex.GetType(), true);
-                                break;
-                        }
+                        statusCode = mapper.GetExceptionHandlerReturnCode(ex as BaseApiException);
+                        context.Response.StatusCode = (int)statusCode;
+                        logger.LogInformation(ex,
+                            "Mapped BaseApiException of type {exceptionType} caught by ApiExceptionHandler. Will return with {statusCode}. Unexpected: {unexpected}",
+                            ex.GetType(), $"{statusCode.ToString()} ({(int)statusCode})", false);
                     }
                     catch (ArgumentException)
                     {
@@ -76,7 +56,7 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
                     break;
             }
 
-            var error = new ApiError
+            var error = new ApiError(mapper.Options.ServiceName)
             {
                 CorrelationId = context.TraceIdentifier,
                 DeveloperContext = developerContext,

@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionPrefix>3.3.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>Frogvall.AspNetCore.ApiUtilities</RootNamespace>
     <AssemblyName>ApiUtilities</AssemblyName>
     <PackageId>Frogvall.AspNetCore.ApiUtilities</PackageId>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

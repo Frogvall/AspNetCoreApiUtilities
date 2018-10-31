@@ -1,12 +1,13 @@
-﻿using Frogvall.AspNetCore.ApiUtilities.Mapper;
+﻿using System.Net;
+using Frogvall.AspNetCore.ApiUtilities.Mapper;
 
 namespace AspNetCoreApiUtilities.Tests.TestResources
 {
-    public class TestExceptionMappingProfile : ExceptionMappingProfile
+    public class TestExceptionMappingProfile : ExceptionMappingProfile<TestEnum>
     {
         public TestExceptionMappingProfile()
         {
-            AddMapping<TestException>(ExceptionReturnType.Error, 80);
+            AddMapping<TestException>(HttpStatusCode.BadRequest, TestEnum.MyFirstValue);
         }
     }
 }

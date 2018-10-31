@@ -31,6 +31,10 @@ Edit your Startup.cs ->
           //...
 
           services.AddExceptionMapper();
+          services.AddMvc(options =>
+             {
+                options.Filters.Add<ApiExceptionFilterAttribute>();
+             });
 
           //...
         }
@@ -48,13 +52,22 @@ Create an exeption that inherits BaseApiException ->
 ```cs
         public class MyException : BaseApiException
 ```
+
+Create an enum that describes your error codes ->
+```cs
+        public enum MyErrorEnum
+        {
+           MyErrorCode = 1337
+        }
+```
+
 Create one or more exception mapper profiles anywhere in your project. Add mappings in the constructor of the profile ->
 ```cs
-        public class MyMappingProfile : ExceptionMappingProfile
+        public class MyMappingProfile : ExceptionMappingProfile<MyErrorEnum>
         {
           public MyMappingProfile()
           {
-             AddMapping<MyException>(ExceptionReturnType.Error, 1337);
+             AddMapping<MyException>(HttpStatusCode.BadRequest, MyErrorEnum.MyErrorCode);
           }
         }
 ```
@@ -62,10 +75,18 @@ Throw when returning non 2xx ->
 ```cs
         throw new MyException("Some message.", new { AnyProperty = "AnyValue."});
 ```
-Add to controller method ->1
+Either add to controller method ->
 ```cs
         [ValidateModel(ErrorCode = 123)]
 ```
+Or add to the filters of MVC ->
+```cs
+        services.AddMvc(options =>
+           {
+               options.Filters.Add(new ValidateModelAttribute { ErrorCode = 123 } );
+           });
+```
+
 Add to controller model (dto) property ->
 ```cs
         [RequireNonDefault]

@@ -29,22 +29,9 @@ namespace Frogvall.AspNetCore.ApiUtilities.Middleware
             }
             catch (BaseApiException ex)
             {
-                var exceptionReturnType = _mapper.GetExceptionReturnType(ex);
-                switch (exceptionReturnType)
-                {
-                    case ExceptionReturnType.Error:
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        _logger.LogDebug(ex, "Mapped BaseApiException of type {ExceptionType} caught, decorating response status code: {StatusCode}.", ex.GetType(), HttpStatusCode.BadRequest.ToString());
-                        break;
-                    case ExceptionReturnType.Fault:
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        _logger.LogDebug(ex, "Mapped BaseApiException of type {ExceptionType} caught, decorating response status code: {StatusCode}.", ex.GetType(), HttpStatusCode.InternalServerError.ToString());
-                        break;
-                    default:
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        _logger.LogDebug(ex, "Unmapped BaseApiException of type {ExceptionType} caught, decorating response status code: {StatusCode}.", ex.GetType(), HttpStatusCode.InternalServerError.ToString());
-                        break;
-                }
+                var statusCode = _mapper.GetExceptionHandlerReturnCode(ex);
+                _logger.LogDebug(ex, "Mapped BaseApiException of type {ExceptionType} caught, decorating response status code: {StatusCode}.", ex.GetType(), statusCode.ToString());
+                context.Response.StatusCode = (int)statusCode;
                 throw;
             }
             catch (ApiException ex)

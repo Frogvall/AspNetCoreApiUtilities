@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Frogvall.AspNetCore.ApiUtilities.Exceptions;
 
@@ -9,25 +10,30 @@ namespace Frogvall.AspNetCore.ApiUtilities.Mapper
     internal class ExceptionMapper : IExceptionMapper
     {
         private readonly Dictionary<Type, ExceptionDescription> _map;
+        public ExceptionMapperOptions Options { get; }
 
-        internal ExceptionMapper(IEnumerable<TypeInfo> profiles)
+        internal ExceptionMapper(IEnumerable<TypeInfo> profiles, ExceptionMapperOptions options)
         {
             _map = new Dictionary<Type, ExceptionDescription>();
             foreach (var profile in profiles.Select(t => t.AsType()))
             {
-                if (!(Activator.CreateInstance(profile) is ExceptionMappingProfile profileInstance)) continue;
-                var intersect = _map.Keys.Intersect(profileInstance.ExceptionMap.Keys).ToList();
+                if (!(Activator.CreateInstance(profile) is IExceptionMappingProfile profileInstance)) continue;
+                var exceptionMap = (Dictionary<Type, ExceptionDescription>)profile.GetField(
+                    "ExceptionMap", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField)?.GetValue(profileInstance);
+                if (exceptionMap == null) continue;
+                var intersect = _map.Keys.Intersect(exceptionMap.Keys).ToList();
                 if (intersect.Any()) throw new ArgumentException($"Duplicate entry. Exception returnType already added to map: {string.Join(",", intersect)}");
-                _map = _map.Union(profileInstance.ExceptionMap).ToDictionary(pair => pair.Key, pair => pair.Value);
+                _map = _map.Union(exceptionMap).ToDictionary(pair => pair.Key, pair => pair.Value);
             }
+            Options = options;
         }
 
         internal abstract class ExceptionDescription
         {
-            public ExceptionReturnType ExceptionReturnType { get; set; }
+            public HttpStatusCode ExceptionHandlerReturnCode { get; set; }
         }
 
-        internal class ExceptionDescription<TException> : ExceptionDescription
+        internal class ExceptionDescription<TException> : ExceptionDescription where TException : BaseApiException
         {
             public Func<TException, int> ErrorCode { get; set; }
         }
@@ -57,14 +63,14 @@ namespace Frogvall.AspNetCore.ApiUtilities.Mapper
             }
         }
 
-        public ExceptionReturnType GetExceptionReturnType(BaseApiException exception)
+        public HttpStatusCode GetExceptionHandlerReturnCode(BaseApiException exception)
         {
             var exceptionType = exception.GetType();
             if (!exceptionType.IsSubclassOf(typeof(BaseApiException)))
                 throw new ArgumentException("exception needs to be a subclass of BaseApiException");
             if (!_map.ContainsKey(exceptionType))
                 throw new ArgumentException($"Exception {exceptionType.FullName} has not been mapped. Should be treated as an unexpected exception");
-            return _map[exceptionType].ExceptionReturnType;
+            return _map[exceptionType].ExceptionHandlerReturnCode;
         }
     }
 }

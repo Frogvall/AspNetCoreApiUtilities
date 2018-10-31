@@ -1,6 +1,8 @@
 ﻿using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
+using Frogvall.AspNetCore.ApiUtilities.Mapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Frogvall.AspNetCore.ApiUtilities.Attributes
 {
@@ -12,7 +14,8 @@ namespace Frogvall.AspNetCore.ApiUtilities.Attributes
         {
             if (!context.ModelState.IsValid)
             {
-                context.Result = new BadRequestObjectResult(new ApiError(ErrorCode, context.ModelState, context.HttpContext.TraceIdentifier));
+                var mapper = context.HttpContext.RequestServices.GetService<IExceptionMapper>();
+                context.Result = new BadRequestObjectResult(new ApiError(ErrorCode, context.ModelState, context.HttpContext.TraceIdentifier, mapper.Options.ServiceName));
             }
         }
     }
