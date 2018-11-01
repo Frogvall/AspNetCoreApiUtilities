@@ -35,9 +35,10 @@ namespace AspNetCoreApiUtilities.Tests
                 {
                     services.AddExceptionMapper();
                     services.AddMvc(options =>
-                        {
-                            options.Filters.Add<ApiExceptionFilterAttribute>();
-                        });
+                    {
+                        options.Filters.Add(new ValidateModelFilter {ErrorCode = 1337});
+                        options.Filters.Add<ApiExceptionFilter>();
+                    });
                 })
                 .Configure(app =>
                 {

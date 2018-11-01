@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Frogvall.AspNetCore.ApiUtilities.Attributes;
 using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,7 +33,10 @@ namespace AspNetCoreApiUtilities.Tests
                 .ConfigureServices(services =>
                 {
                     services.AddExceptionMapper();
-                    services.AddMvc();
+                    services.AddMvc(options =>
+                    {
+                        options.Filters.Add(new ValidateModelFilter { ErrorCode = 1337 });
+                    });
                 })
                 .Configure(app =>
                 {
@@ -43,6 +47,19 @@ namespace AspNetCoreApiUtilities.Tests
 
             var server = new TestServer(builder);
             _client = server.CreateClient();
+        }
+
+        [Fact]
+        public async Task PostTest_NoValidation_ReturnsOk()
+        {
+            //Arrange
+            var content = new StringContent($@"{{""NullableObject"": ""string"", ""NonNullableObject"": 0}}", Encoding.UTF8, "text/json");
+
+            // Act
+            var response = await _client.PostAsync("/api/Test/NoValidation", content);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
         }
 
         [Fact]

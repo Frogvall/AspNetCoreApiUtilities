@@ -10,15 +10,15 @@ using Newtonsoft.Json.Serialization;
 
 namespace Frogvall.AspNetCore.ApiUtilities.Attributes
 {
-    public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
+    public class ApiExceptionFilter : ExceptionFilterAttribute
     {
         private readonly IExceptionMapper _mapper;
         private readonly IHostingEnvironment _env;
-        private readonly ILogger<ApiExceptionFilterAttribute> _logger;
+        private readonly ILogger<ApiExceptionFilter> _logger;
         private readonly JsonSerializer _serializer;
 
-        public ApiExceptionFilterAttribute(IExceptionMapper mapper, IHostingEnvironment env,
-            ILogger<ApiExceptionFilterAttribute> logger)
+        public ApiExceptionFilter(IExceptionMapper mapper, IHostingEnvironment env,
+            ILogger<ApiExceptionFilter> logger)
         {
             _mapper = mapper;
             _env = env;

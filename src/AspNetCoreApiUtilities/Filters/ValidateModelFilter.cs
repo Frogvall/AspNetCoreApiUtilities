@@ -1,17 +1,24 @@
 ﻿using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Frogvall.AspNetCore.ApiUtilities.Mapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Frogvall.AspNetCore.ApiUtilities.Attributes
 {
-    public sealed class ValidateModelAttribute : ActionFilterAttribute
+    public sealed class ValidateModelFilter : ActionFilterAttribute
     {
         public int ErrorCode { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            var controllerActionDescriptor = (ControllerActionDescriptor)context.ActionDescriptor;
+            if (controllerActionDescriptor != null 
+                && (controllerActionDescriptor.ControllerTypeInfo != null && controllerActionDescriptor.ControllerTypeInfo.IsDefined(typeof(SkipModelValidationFilterAttribute), false) 
+                || controllerActionDescriptor.MethodInfo != null && controllerActionDescriptor.MethodInfo.IsDefined(typeof(SkipModelValidationFilterAttribute), false)))
+                return;
+
             if (!context.ModelState.IsValid)
             {
                 var mapper = context.HttpContext.RequestServices.GetService<IExceptionMapper>();

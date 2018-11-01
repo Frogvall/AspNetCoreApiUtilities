@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AspNetCoreApiUtilities.Tests.TestResources;
 using FluentAssertions;
+using Frogvall.AspNetCore.ApiUtilities.Attributes;
 using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
 using Frogvall.AspNetCore.ApiUtilities.Mapper;
 using Microsoft.AspNetCore.Builder;
@@ -38,7 +39,10 @@ namespace AspNetCoreApiUtilities.Tests
                     {
                         ServiceName = TestServiceName
                     });
-                    services.AddMvc();
+                    services.AddMvc(options =>
+                    {
+                        options.Filters.Add(new ValidateModelFilter { ErrorCode = 1337 });
+                    });
                 })
                 .Configure(app =>
                 {

@@ -9,7 +9,6 @@ namespace AspNetCoreApiUtilities.Tests.TestResources
     public class TestController : Controller
     {
         [HttpPost]
-        [ValidateModel(ErrorCode = 1337)]
         public IActionResult PostTest([FromBody] TestDto testDto)
         {
             if (testDto.NonNullableObject < 0)
@@ -19,15 +18,22 @@ namespace AspNetCoreApiUtilities.Tests.TestResources
             }
 
             if (testDto.NonNullableObject > 4)
-                throw new TestException3(TestEnum.MyThirdValue, "Object > 4", new TestDeveloperContext { TestContext = "Test1" });
+                throw new TestException3(TestEnum.MyThirdValue, "Object > 4",
+                    new TestDeveloperContext {TestContext = "Test1"});
             if (testDto.NonNullableObject > 3)
                 throw new ApiException(HttpStatusCode.Conflict, "Non-500 statuscode thrown.");
             if (testDto.NonNullableObject > 2)
-                throw new TestException("Object > 2", new TestDeveloperContext { TestContext = "Test1" });
+                throw new TestException("Object > 2", new TestDeveloperContext {TestContext = "Test1"});
             if (testDto.NonNullableObject > 1)
-                throw new TestException2("Object > 3", new TestDeveloperContext { TestContext = "Test2" });
+                throw new TestException2("Object > 3", new TestDeveloperContext {TestContext = "Test2"});
             return Ok();
         }
 
+        [HttpPost("NoValidation")]
+        [SkipModelValidationFilter]
+        public IActionResult PostTestNoValidation([FromBody] TestDto testDto)
+        {
+            return Ok();
+        }
     }
 }
