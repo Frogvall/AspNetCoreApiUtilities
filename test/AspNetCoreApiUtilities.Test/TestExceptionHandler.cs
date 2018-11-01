@@ -1,12 +1,11 @@
 ﻿using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AspNetCoreApiUtilities.Tests.TestResources;
 using FluentAssertions;
-using Frogvall.AspNetCore.ApiUtilities.Attributes;
 using Frogvall.AspNetCore.ApiUtilities.ExceptionHandling;
+using Frogvall.AspNetCore.ApiUtilities.Filters;
 using Frogvall.AspNetCore.ApiUtilities.Mapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
