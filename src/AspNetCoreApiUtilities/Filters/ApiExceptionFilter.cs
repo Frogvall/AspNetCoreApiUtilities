@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Frogvall.AspNetCore.ApiUtilities.Attributes
+namespace Frogvall.AspNetCore.ApiUtilities.Filters
 {
     public class ApiExceptionFilter : ExceptionFilterAttribute
     {

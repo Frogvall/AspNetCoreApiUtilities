@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>3.4.0</VersionPrefix>
+    <VersionPrefix>3.4.1</VersionPrefix>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>Frogvall.AspNetCore.ApiUtilities</RootNamespace>
     <AssemblyName>ApiUtilities</AssemblyName>
