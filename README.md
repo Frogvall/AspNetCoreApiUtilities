@@ -83,7 +83,7 @@ Or add to the filters of MVC ->
 ```cs
         services.AddMvc(options =>
            {
-               options.Filters.Add(new ValidateModel { ErrorCode = 123 } );
+               options.Filters.Add(new ValidateModelFilter { ErrorCode = 123 } );
            });
 ```
 
