@@ -33,7 +33,7 @@ Edit your Startup.cs ->
           services.AddExceptionMapper();
           services.AddMvc(options =>
              {
-                options.Filters.Add<ApiExceptionFilterAttribute>();
+                options.Filters.Add<ApiExceptionFilter>();
              });
 
           //...
@@ -75,15 +75,15 @@ Throw when returning non 2xx ->
 ```cs
         throw new MyException("Some message.", new { AnyProperty = "AnyValue."});
 ```
-Either add to controller method ->
+Either add to controller or controller method ->
 ```cs
-        [ValidateModel(ErrorCode = 123)]
+        [ValidateModelFilter(ErrorCode = 123)]
 ```
 Or add to the filters of MVC ->
 ```cs
         services.AddMvc(options =>
            {
-               options.Filters.Add(new ValidateModelAttribute { ErrorCode = 123 } );
+               options.Filters.Add(new ValidateModelFilter { ErrorCode = 123 } );
            });
 ```
 
