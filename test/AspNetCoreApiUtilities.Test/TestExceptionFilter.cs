@@ -33,7 +33,7 @@ namespace AspNetCoreApiUtilities.Tests
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddExceptionMapper();
+                    services.AddExceptionMapper(GetType());
                     services.AddMvc(options =>
                     {
                         options.Filters.Add(new ValidateModelFilter {ErrorCode = 1337});
