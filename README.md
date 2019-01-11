@@ -97,6 +97,32 @@ Add to swagger spec ->
         options.OperationFilter<InternalServerErrorOperationFilter>();
 ```
 
+To consume the api error from another service using this package in an asynchronous context ->
+```cs
+        var response = await _client.PostAsync(...);
+        var error = await response.ParseApiError();
+        if (error != null)
+        {
+            //Handle api error here
+        }
+        else
+        {
+            //Handle non-api error here
+        }
+```
+
+To consume the api error from another service using this package in a synchronous context ->
+```cs
+        if (response.TryParseApiError(out var error))
+        {
+            //Handle api error here
+        }
+        else
+        {
+            //Handle non-api error here
+        }
+```
+
 ## Build and Publish
 
 ### Prequisites

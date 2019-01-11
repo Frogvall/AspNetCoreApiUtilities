@@ -29,6 +29,13 @@ namespace AspNetCoreApiUtilities.Tests.TestResources
             return Ok();
         }
 
+        [HttpPost("NoExceptionNo20x")]
+        [SkipModelValidationFilter]
+        public IActionResult PostTestNoExceptionNo20x([FromBody] TestDto testDto)
+        {
+            return BadRequest("Returning 400 without ApiError syntax");
+        }
+
         [HttpPost("NoValidation")]
         [SkipModelValidationFilter]
         public IActionResult PostTestNoValidation([FromBody] TestDto testDto)
