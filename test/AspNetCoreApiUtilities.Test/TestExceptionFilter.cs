@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -12,18 +13,23 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace AspNetCoreApiUtilities.Tests
 {
     public class TestExceptionFilter
     {
         private HttpClient _client;
+        private readonly ITestOutputHelper _output;
 
-        public TestExceptionFilter()
+        public TestExceptionFilter(ITestOutputHelper output)
         {
+            _output = output;
             // Run for every test case
             SetupServer();
         }
@@ -33,6 +39,11 @@ namespace AspNetCoreApiUtilities.Tests
             var builder = new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
+                    var descriptor =
+                        new ServiceDescriptor(
+                            typeof(ILogger<ApiExceptionFilter>),
+                            TestLogger.Create<ApiExceptionFilter>(_output));
+                    services.Replace(descriptor);
                     services.AddExceptionMapper(GetType());
                     services.AddMvc(options =>
                     {

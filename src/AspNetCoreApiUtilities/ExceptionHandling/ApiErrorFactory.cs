@@ -30,8 +30,8 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
                         statusCode = mapper.GetExceptionHandlerReturnCode(ex as BaseApiException);
                         context.Response.StatusCode = (int)statusCode;
                         logger.LogInformation(ex,
-                            "Mapped BaseApiException of type {exceptionType} caught by ApiExceptionHandler. Will return with {statusCode}. Unexpected: {unexpected}",
-                            ex.GetType(), $"{statusCode.ToString()} ({(int)statusCode})", false);
+                            "Mapped BaseApiException of type {exceptionType} caught by ApiExceptionHandler. Will return with {statusCodeInt} {statusCodeString}. Unexpected: {unexpected}",
+                            ex.GetType(), (int)statusCode, statusCode.ToString(), false);
                     }
                     catch (ArgumentException)
                     {
@@ -44,15 +44,15 @@ namespace Frogvall.AspNetCore.ApiUtilities.ExceptionHandling
                     statusCode = (ex as ApiException).StatusCode;
                     context.Response.StatusCode = (int)statusCode;
                     logger.LogInformation(ex,
-                        "ApiException caught by ApiExceptionHandler with {statusCode}. Unexpected: {unexpected}", statusCode, false);
+                        "ApiException caught by ApiExceptionHandler with  {statusCodeInt} {statusCodeString}. Unexpected: {unexpected}", (int)statusCode, statusCode.ToString(), false);
                     break;
                 default:
                     errorCode = -1;
                     statusCode = HttpStatusCode.InternalServerError;
                     context.Response.StatusCode = (int)statusCode;
                     logger.LogError(ex,
-                        "Unhandled exception of type {exceptionType} caught by ApiExceptionHandler. Unexpected: {unexpected}",
-                        ex.GetType(), true);
+                        "Unhandled exception of type {exceptionType} caught by ApiExceptionHandler. Will return with {statusCodeInt} {statusCodeString}. Unexpected: {unexpected}",
+                        ex.GetType(), (int)statusCode, statusCode.ToString(), true);
                     break;
             }
 
