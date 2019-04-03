@@ -1,3 +1,5 @@
+**Not happy about naming and scope. This package is therefore discontinued and moved to [a new repo](https://github.com/Frogvall/aspnetcore-exceptionhandler), where it is divided into several packages and names reflect what the package is actually about.**
+
 # AspNetCoreApiUtilities
 
 [![CircleCI](https://circleci.com/gh/schwamster/HttpService.svg?style=shield&circle-token)](https://circleci.com/gh/Frogvall/AspNetCoreApiUtilities)
